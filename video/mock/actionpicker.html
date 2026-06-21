@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<style>
+  :root{
+    --text:#1D1D1F; --sub:#86868B; --sel:#0A66FF; --trace:#1F5AE6;
+    --card:#FFFFFF; --gb:#F6F6F8; --line:#E2E2E6;
+    --ui:-apple-system,"SF Pro Text",system-ui,sans-serif;
+    --mono:"SF Mono",ui-monospace,Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;}
+  body{padding:64px;font-family:var(--ui);-webkit-font-smoothing:antialiased;background:transparent;}
+  .sheet{
+    width:520px;background:var(--card);border-radius:14px;padding:24px;
+    box-shadow:0 34px 90px rgba(0,0,0,.34),0 0 0 .5px rgba(0,0,0,.16);position:relative;
+  }
+  .h{font-size:19px;font-weight:700;color:var(--text);margin-bottom:18px;}
+  .gb{border:.5px solid var(--line);border-radius:11px;padding:16px;margin-bottom:16px;position:relative;}
+  .gb>.lbl{position:absolute;top:-9px;left:12px;background:var(--card);padding:0 6px;font-size:12px;font-weight:600;color:var(--sub);}
+  .rowflex{display:flex;gap:10px;align-items:center;}
+  .picker{flex:1;display:flex;align-items:center;justify-content:space-between;border:.5px solid #CFCFD4;border-radius:8px;padding:8px 11px;font-size:13.5px;background:linear-gradient(#fff,#fafafa);}
+  .picker .chev{color:#9a9aa0;font-size:11px;}
+  .rec{display:flex;align-items:center;gap:6px;border:.5px solid #CFCFD4;border-radius:8px;padding:8px 12px;font-size:13px;color:var(--text);background:#fff;}
+  .seg{display:flex;margin-top:12px;border:.5px solid #CFCFD4;border-radius:8px;overflow:hidden;}
+  .seg div{flex:1;text-align:center;font-size:13px;padding:7px 0;border-right:.5px solid #CFCFD4;color:var(--text);}
+  .seg div:last-child{border-right:0;}
+  .seg div.on{background:var(--sel);color:#fff;}
+  .cap{font-size:11.5px;color:var(--sub);margin-top:10px;line-height:1.4;}
+  .actbtn{display:flex;align-items:center;gap:9px;border:.5px solid #CFCFD4;border-radius:8px;padding:9px 12px;font-size:13.5px;background:linear-gradient(#fff,#fafafa);}
+  .actbtn .ic{color:var(--trace);display:grid;place-items:center;}
+  .actbtn .sp{flex:1;}
+  .actbtn .chev{color:#9a9aa0;font-size:11px;}
+  /* popover */
+  .pop{position:absolute;left:34px;top:330px;width:330px;background:#fff;border-radius:12px;
+    box-shadow:0 22px 60px rgba(0,0,0,.30),0 0 0 .5px rgba(0,0,0,.14);overflow:hidden;}
+  .pop .search{display:flex;align-items:center;gap:8px;padding:11px 13px;border-bottom:.5px solid var(--line);color:#9a9aa0;font-size:13px;}
+  .sec{padding:8px 8px 4px;}
+  .sech{display:flex;align-items:center;gap:7px;padding:5px 6px;font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--sub);text-transform:uppercase;}
+  .sech .chev{margin-left:auto;color:#bcbcc2;font-size:10px;}
+  .opt{display:flex;align-items:center;gap:10px;padding:7px 9px;border-radius:7px;font-size:13.5px;color:var(--text);}
+  .opt .ic{color:var(--trace);display:grid;place-items:center;width:20px;}
+  .opt.sel{background:rgba(10,102,255,.12);}
+  .opt .ck{margin-left:auto;color:var(--sel);}
+  svg{display:block;}
+</style>
+</head>
+<body>
+  <div class="sheet">
+    <div class="h">New Binding</div>
+
+    <div class="gb">
+      <span class="lbl">When this happens</span>
+      <div class="rowflex">
+        <div class="picker">Trackpad Tap <span class="chev">▾</span></div>
+        <div class="rec"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1D1D1F" stroke-width="1.6"><path d="M4 18c5-1 7-9 12-11"/><circle cx="17" cy="6.5" r="2"/></svg>Record</div>
+      </div>
+      <div class="seg"><div>2</div><div class="on">3</div><div>4</div><div>5</div></div>
+      <div class="cap">Fires on a quick stationary tap. Single-finger taps are excluded so normal clicking still works.</div>
+    </div>
+
+    <div class="gb">
+      <span class="lbl">Do this</span>
+      <div class="actbtn">
+        <span class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1F5AE6" stroke-width="1.7"><path d="M3 7h7v10H4a1 1 0 0 1-1-1z" fill="#1F5AE6" fill-opacity=".15"/><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 5v14"/></svg></span>
+        Maximize Window<span class="sp"></span><span class="chev">⌃⌄</span>
+      </div>
+    </div>
+
+    <!-- popover -->
+    <div class="pop">
+      <div class="search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9a9aa0" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>Search actions</div>
+
+      <div class="sec">
+        <div class="sech"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#86868B" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18"/></svg>Window Management<span class="chev">▾</span></div>
+        <div class="opt"><span class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1F5AE6" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><rect x="3" y="5" width="9" height="14" fill="#1F5AE6" fill-opacity=".18" stroke="none"/><path d="M12 5v14"/></svg></span>Snap Left Half</div>
+        <div class="opt"><span class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1F5AE6" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><rect x="12" y="5" width="9" height="14" fill="#1F5AE6" fill-opacity=".18" stroke="none"/><path d="M12 5v14"/></svg></span>Snap Right Half</div>
+        <div class="opt sel"><span class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1F5AE6" stroke-width="1.7"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></span>Maximize Window<span class="ck"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0A66FF" stroke-width="2.2"><path d="M5 12l5 5 9-11"/></svg></span></div>
+        <div class="opt"><span class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1F5AE6" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><rect x="8" y="9" width="8" height="6" fill="#1F5AE6" fill-opacity=".18" stroke="none"/></svg></span>Center Window</div>
+      </div>
+
+      <div class="sec">
+        <div class="sech"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#86868B" stroke-width="1.6"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M17 8a5 5 0 0 1 0 8"/></svg>Audio &amp; Media<span class="chev">▾</span></div>
+        <div class="opt"><span class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1F5AE6" stroke-width="1.6"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 8a5 5 0 0 1 0 8"/></svg></span>Volume Up</div>
+        <div class="opt"><span class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1F5AE6" stroke-width="1.6"><path d="M6 9v6h4l5 4V5l-5 4z"/><path d="M19 9l-4 6M15 9l4 6"/></svg></span>Toggle Mute</div>
+        <div class="opt"><span class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1F5AE6" stroke-width="1.6"><path d="M6 4l10 8-10 8z" fill="#1F5AE6" fill-opacity=".18"/></svg></span>Play / Pause</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

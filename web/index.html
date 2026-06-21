@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AverageTouchTool — trackpad gestures &amp; custom actions for macOS</title>
+  <meta name="description" content="An open-source, native macOS menu-bar app for trackpad gestures, custom actions, a customizable Touch Bar, and per-app profiles. It's called Average. It's actually pretty good." />
+
+  <meta property="og:title" content="AverageTouchTool" />
+  <meta property="og:description" content="Trackpad gestures and custom actions for macOS. Named conservatively." />
+  <meta property="og:type" content="website" />
+
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="topbar">
+    <a class="wordmark" href="#top" aria-label="AverageTouchTool home">
+      <span class="wordmark__mark" aria-hidden="true"></span>
+      <span class="wordmark__text"><span class="wordmark__avg">Average</span>TouchTool</span>
+    </a>
+    <nav class="topnav" aria-label="Primary">
+      <a href="#gestures">Gestures</a>
+      <a href="#actions">Actions</a>
+      <a href="#demo">Demo</a>
+      <a href="#install">Install</a>
+      <a class="topnav__cta" href="https://github.com/SuharshTyagii/AverageTouchTool">GitHub</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <!-- ============ HERO ============ -->
+    <section class="hero" id="top">
+      <div class="hero__copy">
+        <p class="eyebrow">Open source · native macOS menu-bar app</p>
+        <h1 class="hero__title">Trackpad gestures<br />and custom actions<br />for macOS.</h1>
+        <p class="hero__lede">
+          It's called <em>Average</em>. We benchmarked it against ourselves
+          and it won. Map taps, swipes, pinches and rotates to anything —
+          window snapping, media keys, screenshots, shell, AppleScript.
+        </p>
+        <div class="hero__actions">
+          <a class="btn btn--primary" href="https://github.com/SuharshTyagii/AverageTouchTool/releases/latest/download/AverageTouchTool.dmg">Download for macOS</a>
+          <a class="btn btn--ghost" href="https://github.com/SuharshTyagii/AverageTouchTool">View source</a>
+        </div>
+        <p class="hero__meta">macOS 14+ · Apple Silicon &amp; Intel · MIT licensed · <a href="https://github.com/SuharshTyagii/AverageTouchTool/releases">Releases →</a></p>
+      </div>
+
+      <!-- Hero demo video -->
+      <figure class="hero-video">
+        <video controls playsinline preload="metadata" poster="assets/att-demo-poster.jpg">
+          <source src="assets/att-demo.mp4" type="video/mp4" />
+          Your browser can't play this video.
+        </video>
+      </figure>
+    </section>
+
+    <!-- ============ DETECTION MODEL STRIP ============ -->
+    <section class="specstrip" aria-label="Detection model">
+      <div class="specstrip__item"><span class="specstrip__num">2–5</span><span class="specstrip__lbl">finger taps</span></div>
+      <div class="specstrip__item"><span class="specstrip__num">0.10</span><span class="specstrip__lbl">swipe travel ≥</span></div>
+      <div class="specstrip__item"><span class="specstrip__num">0.06</span><span class="specstrip__lbl">tap travel &lt;</span></div>
+      <div class="specstrip__item"><span class="specstrip__num">0.30</span><span class="specstrip__lbl">rotate rad ≥</span></div>
+      <div class="specstrip__item"><span class="specstrip__num">∞</span><span class="specstrip__lbl">actions per trigger</span></div>
+    </section>
+
+    <!-- ============ GESTURES ============ -->
+    <section class="block" id="gestures">
+      <header class="block__head">
+        <p class="eyebrow">What it reads</p>
+        <h2 class="block__title">Real finger counts, from raw multitouch frames.</h2>
+        <p class="block__sub">
+          macOS won't tell ordinary apps how many fingers are down.
+          AverageTouchTool reads the raw trackpad contact frames directly, so a
+          three-finger swipe is genuinely three fingers — not a guess.
+        </p>
+      </header>
+      <ul class="gesture-grid">
+        <li class="gcard"><span class="gcard__glyph" data-g="tap"></span><h3>Taps</h3><p>2, 3, 4 or 5 fingers. Stationary and quick — measured only while every finger is down.</p></li>
+        <li class="gcard"><span class="gcard__glyph" data-g="swipe"></span><h3>Swipes</h3><p>Up, down, left, right with 2–4 fingers. Direction from the dominant travel axis.</p></li>
+        <li class="gcard"><span class="gcard__glyph" data-g="pinch"></span><h3>Pinch</h3><p>Two fingers, in or out. Classified by change in spread between contacts.</p></li>
+        <li class="gcard"><span class="gcard__glyph" data-g="rotate"></span><h3>Rotate</h3><p>Two fingers, clockwise or counter. Angle folded to ±90° so finger order can't flip it.</p></li>
+      </ul>
+      <p class="block__note">
+        Don't want to remember the picker? Hit <strong>Record</strong> in the
+        binding editor and just perform the gesture — it fills in the trigger.
+      </p>
+    </section>
+
+    <!-- ============ ACTIONS ============ -->
+    <section class="block block--alt" id="actions">
+      <header class="block__head">
+        <p class="eyebrow">What it does</p>
+        <h2 class="block__title">A searchable action library, by category.</h2>
+        <p class="block__sub">Bind any trigger to one action or a whole chain. Pick from a categorized, searchable list — every entry has an icon.</p>
+      </header>
+      <div class="actiongrid">
+        <article class="acat"><h3>Window</h3><ul><li>Snap left / right half</li><li>Maximize</li><li>Center</li></ul></article>
+        <article class="acat"><h3>Audio &amp; media</h3><ul><li>Volume up / down · mute</li><li>Mic mute</li><li>Play / pause · next · prev</li></ul></article>
+        <article class="acat"><h3>System</h3><ul><li>Mission Control</li><li>Open Control Center</li><li>Lock screen · Night Shift</li></ul></article>
+        <article class="acat"><h3>Screenshots</h3><ul><li>Capture selection</li><li>Capture whole screen</li><li>Copies to clipboard + saves</li></ul></article>
+        <article class="acat"><h3>Launch &amp; run</h3><ul><li>Launch app · open URL</li><li>Run shell command</li><li>Run AppleScript</li></ul></article>
+        <article class="acat"><h3>Keyboard</h3><ul><li>Send any keyboard shortcut</li><li>Even combos macOS steals</li><li>Optionally consume the key</li></ul></article>
+      </div>
+    </section>
+
+    <!-- ============ DEMO VIDEO ============ -->
+    <section class="block demo" id="demo">
+      <header class="block__head">
+        <p class="eyebrow">In motion</p>
+        <h2 class="block__title">The 40-second tour.</h2>
+      </header>
+      <div class="video-frame">
+        <video id="demo-video" controls playsinline preload="metadata" poster="assets/demo-poster.png">
+          <source src="assets/averagetouchtool-demo.mp4" type="video/mp4" />
+          Your browser can't play the demo video.
+        </video>
+      </div>
+      <p class="block__note">Rendered with Remotion. Source for the video lives in <code>/video</code>.</p>
+    </section>
+
+    <!-- ============ EXTRA FEATURES ============ -->
+    <section class="block" id="more">
+      <div class="featrow">
+        <div class="feat"><h3>Per-app profiles</h3><p>Bindings can be global or scoped to a frontmost app. App profiles win over global.</p></div>
+        <div class="feat"><h3>Customizable Touch Bar</h3><p>One launcher in the Control Strip opens a full-width modal with every button and slider you configure.</p></div>
+        <div class="feat"><h3>Import / export</h3><p>Your whole setup — profiles, bindings, Touch Bar — is a single JSON file you can back up or share.</p></div>
+      </div>
+    </section>
+
+    <!-- ============ INSTALL ============ -->
+    <section class="block block--alt install" id="install">
+      <header class="block__head">
+        <p class="eyebrow">Get it</p>
+        <h2 class="block__title">Download and drag to Applications.</h2>
+        <p class="block__sub">Grab the latest <code>.dmg</code>, or build from source. No Electron, no runtime — a native menu-bar app.</p>
+      </header>
+
+      <div class="download">
+        <a class="btn btn--primary" href="https://github.com/SuharshTyagii/AverageTouchTool/releases/latest/download/AverageTouchTool.dmg">Download AverageTouchTool.dmg</a>
+        <a class="btn btn--ghost" href="https://github.com/SuharshTyagii/AverageTouchTool/releases">All releases &amp; notes →</a>
+      </div>
+      <p class="block__note">
+        First launch: right-click the app → <strong>Open</strong> (it's signed but
+        not yet notarized, so Gatekeeper asks once). Then grant
+        <strong>Accessibility</strong> + <strong>Input Monitoring</strong>
+        (and Screen Recording for captures).
+      </p>
+
+      <p class="install__or">Or build from source:</p>
+      <div class="terminal" aria-label="Install commands">
+        <div class="terminal__bar"><span></span><span></span><span></span></div>
+        <pre class="terminal__body"><code><span class="c-dim"># clone &amp; build the signed .app</span>
+git clone https://github.com/SuharshTyagii/AverageTouchTool.git
+cd AverageTouchTool
+<span class="c-acc">./package.sh</span>   <span class="c-dim"># builds, signs, installs, launches</span></code></pre>
+        <button class="copy-btn" id="copy-install" type="button">Copy</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__left">
+      <span class="wordmark__text footer__mark"><span class="wordmark__avg">Average</span>TouchTool</span>
+      <p class="footer__lic">MIT licensed · open source</p>
+    </div>
+    <div class="footer__right">
+      <p>Built by <a href="https://suharshh.com">Suharsh Tyagi</a></p>
+      <p><a href="https://github.com/SuharshTyagii/AverageTouchTool">github.com/SuharshTyagii/AverageTouchTool</a></p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

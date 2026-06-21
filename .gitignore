@@ -1,0 +1,5 @@
+.build
+BetterTouch.app/
+AverageTouchTool.app/
+.DS_Store
+*.dmg

@@ -1,0 +1,28 @@
+# AverageTouchTool landing page — static nginx site behind the shared Traefik
+# proxy. Mirrors the suharsh-portfolio deploy pattern: Traefik discovers this
+# container from its labels on the external "web" network. TLS uses the existing
+# *.suharshh.com origin cert (Traefik default store), so no proxy config change.
+services:
+  averagetouchtool:
+    build: .
+    image: averagetouchtool
+    container_name: averagetouchtool
+    restart: unless-stopped
+    networks:
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=web"
+      - "traefik.http.routers.averagetouchtool.rule=Host(`averagetouchtool.suharshh.com`)"
+      - "traefik.http.routers.averagetouchtool.entrypoints=websecure"
+      - "traefik.http.routers.averagetouchtool.tls=true"
+      - "traefik.http.services.averagetouchtool.loadbalancer.server.port=80"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  web:
+    external: true
