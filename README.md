@@ -1,92 +1,72 @@
-# BetterTouch
+<h1 align="center">AverageTouchTool</h1>
 
-A native macOS menu-bar automation app inspired by BetterTouchTool. It captures
-**real** keyboard shortcuts and trackpad gestures and runs **real** system
-actions, with per-app profiles and a SwiftUI config window.
+<p align="center">
+  Trackpad gestures &amp; custom actions for macOS. Named conservatively.<br>
+  A native, open-source menu-bar app — no Electron, no runtime.
+</p>
 
-Built as a Swift package (Swift 6.3 / macOS 14+). No Electron, no terminal — a
-proper `NSApplication` menu-bar agent.
+<p align="center">
+  <a href="https://github.com/SuharshTyagii/AverageTouchTool/releases/latest/download/AverageTouchTool.dmg"><img alt="Download" src="https://img.shields.io/badge/Download-.dmg-1F5AE6?style=for-the-badge"></a>
+  <a href="https://github.com/SuharshTyagii/AverageTouchTool/releases"><img alt="Release" src="https://img.shields.io/github/v/release/SuharshTyagii/AverageTouchTool?style=for-the-badge"></a>
+  <img alt="Platform" src="https://img.shields.io/badge/macOS-14%2B-111?style=for-the-badge">
+  <img alt="License" src="https://img.shields.io/badge/License-MIT-111?style=for-the-badge">
+</p>
 
-## Run it
+## Demo
 
-**Option A — Xcode (recommended; permissions attribute cleanly):**
+<p align="center">
+  <a href="https://github.com/SuharshTyagii/AverageTouchTool/raw/main/web/assets/att-demo.mp4">
+    <img src="web/assets/att-demo-poster.jpg" width="70%" alt="Watch the demo">
+  </a>
+  <br><em>▶ Click to watch the demo</em>
+</p>
+
+## Screenshots
+
+<p align="center">
+  <img src="video/public/screens/settings.png" width="52%" alt="Settings — profiles &amp; bindings">
+  <img src="video/public/screens/action-picker.png" width="36%" alt="Searchable, categorized action picker">
+</p>
+
+## Install
+
+**Download the app**
+
+1. Grab the latest [**AverageTouchTool.dmg**](https://github.com/SuharshTyagii/AverageTouchTool/releases/latest/download/AverageTouchTool.dmg) and drag it to **Applications**.
+2. First launch: **right-click the app → Open** (it's code-signed but not yet notarized, so Gatekeeper asks once). If macOS still blocks it:
+   ```bash
+   xattr -dr com.apple.quarantine /Applications/AverageTouchTool.app
+   ```
+3. Grant **Accessibility** + **Input Monitoring** when prompted (and **Screen Recording** for the capture actions).
+
+**Or build from source** (Swift 6 / macOS 14+, Xcode command-line tools):
+
 ```bash
-open /Users/mac/Documents/BetterTouch/Package.swift
-```
-Then press ▶ (the `BetterTouch` scheme). A menu-bar icon appears (hand/keyboard
-glyph) — there's no Dock icon by design.
-
-**Option B — terminal:**
-```bash
-cd /Users/mac/Documents/BetterTouch
-swift run
+git clone https://github.com/SuharshTyagii/AverageTouchTool.git
+cd AverageTouchTool
+./package.sh   # builds, signs, installs, and launches
 ```
 
-## Grant permissions (required for keyboard capture)
+## Features
 
-macOS gates global input. On first launch the app requests Accessibility; you
-also need Input Monitoring for the keyboard event tap:
+- **Trackpad gestures** — 2–5 finger **taps**, multi-finger **swipes** (↑↓←→), two-finger **pinch** and **rotate**, read from raw multitouch frames for true finger counts.
+- **Searchable action library** by category — window snapping (left/right half, maximize, center), media keys, volume / mic, Mission Control, Control Center, lock screen, Night Shift, screenshots, launch app, open URL, run shell / AppleScript, send keyboard shortcut, HUD.
+- **Per-app profiles** — bindings can be global or fire only when a chosen app is frontmost.
+- **Record a gesture** — hit Record in the editor, perform the gesture, and the trigger fills itself in.
+- **Customizable Touch Bar** — one launcher in the Control Strip opens a full-width modal of your buttons and sliders.
+- **Import / export** — your whole setup (profiles, bindings, Touch Bar) is a single JSON file.
+- Starts empty — you build your own bindings.
 
-1. Menu-bar icon → **Settings…** — the orange banner has buttons that jump
-   straight to the right panes.
-2. **System Settings → Privacy & Security → Accessibility** → enable BetterTouch
-   (or Xcode, if running from Xcode).
-3. **System Settings → Privacy & Security → Input Monitoring** → enable it too.
-4. Back in the app, click **Recheck** (or "Retry keyboard capture" in the menu).
+## Requirements
 
-Trackpad swipes/force-click work without these (they use observe-only monitors).
+macOS 14+ · Apple Silicon &amp; Intel.
 
-## What it does
+## Repo layout
 
-- **Menu-bar agent** with global enable/disable and a Settings window.
-- **Keyboard shortcuts** — captured via `CGEventTap`; can **consume** the
-  original keystroke (true remap) or pass it through.
-- **Trackpad gestures** — 3-finger swipes (↑↓←→) and force-click, via public
-  `NSEvent` monitors.
-- **Per-app profiles** — a profile bound to a bundle id wins over Global when
-  that app is frontmost (tracked through `NSWorkspace`).
-- **Actions** — Volume Up/Down, Toggle Mute, Run Shell Command, Launch App,
-  Open URL, Send Keyboard Shortcut, Show HUD. Shell/HUD support `{app}`,
-  `{datetime}`, `{random}` tokens.
-- **Live shortcut recorder** in the editor — click Record, press the combo.
-- **Persistence** — `~/Library/Application Support/BetterTouch/config.json`
-  (two example swipe→volume bindings ship preloaded).
+- `Sources/BetterTouch/` — the Swift app (input → engine → actions; Touch Bar subsystem)
+- `web/` — the landing page ([averagetouchtool.suharshh.com](https://averagetouchtool.suharshh.com))
+- `video/` — the Remotion promo project
 
-## Try it
+---
 
-1. Settings → Global is selected → **Add Binding**.
-2. Trigger: *Keyboard Shortcut* → **Record** → press e.g. ⌃⌥H.
-3. Action: *Show HUD Message* → type `Hello from {app}` → **Save**.
-4. Press ⌃⌥H anywhere → the HUD appears. Toggle "Block the original shortcut"
-   to see consume vs. passthrough.
-5. **Add App Profile** (e.g. `com.apple.Safari`), add a binding there, and watch
-   the same trigger behave differently when Safari is frontmost.
-
-## Honest limitations (current slice)
-
-- **No Touch Bar UI.** Apple removed the Touch Bar; there's no hardware/API on
-  this machine, so it's intentionally omitted. A floating widget bar is the
-  natural replacement and is the obvious next addition.
-- **Gestures are public-API only** — swipe + force-click. Distinct finger-count
-  taps/pinch-magnitude need the private MultitouchSupport framework; not wired
-  yet.
-- **One action per binding in the editor.** The model stores an action *list*;
-  the UI currently exposes the first. Multi-action sequences are a small UI add.
-- Conditions (time/window-title) exist conceptually in the design but aren't in
-  this build yet — profiles currently key off frontmost app only.
-
-## Layout
-
-```
-Sources/BetterTouch/
-  App.swift            @main App + AppDelegate + menu-bar menu
-  Models.swift         Trigger / Action / TriggerBinding / Profile / Config
-  ConfigStore.swift    persistence + binding resolution (app profile > global)
-  Engine.swift         input → resolve → run; frontmost-app tracking
-  Input.swift          CGEventTap (keyboard) + NSEvent monitors (gestures) + permissions
-  Actions.swift        real system effects + HUD overlay
-  SettingsUI.swift     three-pane editor (profiles ▸ bindings)
-  BindingEditor.swift  trigger+action editor, permissions banner
-  ShortcutRecorder.swift  live keystroke capture
-  KeyNames.swift       key code → label
-```
+Built by [Suharsh Tyagi](https://suharshh.com) · MIT licensed
