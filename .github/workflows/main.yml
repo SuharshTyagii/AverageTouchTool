@@ -1,0 +1,28 @@
+name: Deploy to Hetzner
+
+# Mirrors the suharsh-portfolio deploy cycle: on push to main, SSH into the
+# server, hard-reset the checkout to origin/main, and rebuild the container.
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy_production:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up SSH key
+        run: |
+          echo "${{ secrets.HETZNER_PROD_SSH_KEY }}" > hetzner_prod_key
+          chmod 600 hetzner_prod_key
+
+      - name: Deploy to server
+        run: |
+          ssh -o StrictHostKeyChecking=no -i hetzner_prod_key \
+            ${{ secrets.HETZNER_PROD_USER }}@${{ secrets.HETZNER_PROD_HOST }} << 'EOF'
+            set -e
+            cd ~/averagetouchtool
+            git fetch origin main
+            git reset --hard origin/main
+            docker compose up --build -d
+          EOF
