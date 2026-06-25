@@ -32,7 +32,7 @@ final class Engine: ObservableObject {
     private init() {}
 
     func start() {
-        keyboard.onKey = { [weak self] key in self?.handleKey(key) ?? false }
+        keyboard.onKey = { [weak self] key, isRepeat in self?.handleKey(key, isRepeat: isRepeat) ?? false }
         MultitouchGesture.shared.onSwipe = { [weak self] dir, fingers in
             self?.handleGesture(.swipe(dir, fingers: fingers))
         }
@@ -88,10 +88,12 @@ final class Engine: ObservableObject {
 
     // MARK: Event handling
 
-    private func handleKey(_ key: KeyEvent) -> Bool {
+    private func handleKey(_ key: KeyEvent, isRepeat: Bool) -> Bool {
         // Recording mode: hand the keystroke to the recorder and swallow it so
         // the underlying combo (e.g. ⌃→ space switch) doesn't also fire.
+        // (Ignore auto-repeat while recording so a held key records once.)
         if let recorder = keyRecorder {
+            if isRepeat { return true }
             keyRecorder = nil
             DispatchQueue.main.async { recorder(key) }
             return true
@@ -101,7 +103,10 @@ final class Engine: ObservableObject {
         where binding.enabled && binding.trigger.kind == .keyboardShortcut {
             if binding.trigger.keyCode == Int(key.keyCode),
                binding.trigger.modifiers == key.modifiers {
-                fire(binding)
+                // On auto-repeat, re-fire only the repeat-safe actions (remaps,
+                // volume) but still consume the event so the held combo never
+                // leaks to a system hotkey like ⌃→ "switch Space".
+                fire(binding, repeatOnly: isRepeat)
                 return binding.consume
             }
         }
@@ -138,11 +143,17 @@ final class Engine: ObservableObject {
         }
     }
 
-    private func fire(_ binding: TriggerBinding) {
+    private func fire(_ binding: TriggerBinding, repeatOnly: Bool = false) {
         let app = frontmostName
-        Log.line("fire: \(binding.trigger.summary) -> \(binding.actions.map(\.summary).joined(separator: ", "))")
+        let actions = repeatOnly
+            ? binding.actions.filter { $0.kind.repeatsWhileHeld }
+            : binding.actions
+        guard !actions.isEmpty else { return }
+        if !repeatOnly {
+            Log.line("fire: \(binding.trigger.summary) -> \(actions.map(\.summary).joined(separator: ", "))")
+        }
         DispatchQueue.main.async {
-            for action in binding.actions {
+            for action in actions {
                 ActionRunner.run(action, frontmostApp: app)
             }
         }

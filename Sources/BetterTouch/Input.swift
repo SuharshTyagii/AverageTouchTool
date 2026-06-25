@@ -44,7 +44,7 @@ enum Permissions {
 /// event (so the keystroke never reaches the focused app), false to pass it on.
 final class KeyboardTap {
     /// Return true to consume.
-    var onKey: ((KeyEvent) -> Bool)?
+    var onKey: ((KeyEvent, Bool) -> Bool)?
 
     private var tap: CFMachPort?
     private var runLoopSource: CFRunLoopSource?
@@ -63,16 +63,23 @@ final class KeyboardTap {
             return me.handle(type: type, event: event)
         }
 
+        // Tap at the HID level (not session level): events here are seen BEFORE
+        // the WindowServer processes system "symbolic hotkeys" like ⌃→ "switch
+        // Space" / Mission Control. A session-level tap runs *after* that, so
+        // consuming ⌃→ there couldn't stop the Space switch. At the HID level our
+        // `return nil` actually suppresses it, so remaps of system shortcuts win.
         guard let tap = CGEvent.tapCreate(
-            tap: .cgSessionEventTap,
+            tap: .cghidEventTap,
             place: .headInsertEventTap,
             options: .defaultTap,
             eventsOfInterest: mask,
             callback: callback,
             userInfo: Unmanaged.passUnretained(self).toOpaque()
         ) else {
+            Log.line("keyboard tap: FAILED to create HID tap (check Input Monitoring/Accessibility)")
             return false
         }
+        Log.line("keyboard tap: created at HID level")
 
         self.tap = tap
         let src = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, tap, 0)
@@ -99,16 +106,18 @@ final class KeyboardTap {
         }
         guard type == .keyDown else { return Unmanaged.passUnretained(event) }
 
-        // Ignore auto-repeat so a held key fires once.
-        if event.getIntegerValueField(.keyboardEventAutorepeat) != 0 {
-            return Unmanaged.passUnretained(event)
-        }
+        // Auto-repeat (held key) is still routed to the matcher so a bound combo
+        // stays consumed for the whole hold. Otherwise repeats leak through to
+        // the system — e.g. a held ⌃→ remap leaks to the "switch Space" hotkey.
+        // `isRepeat` lets the engine re-fire only repeat-safe actions.
+        let isRepeat = event.getIntegerValueField(.keyboardEventAutorepeat) != 0
 
         let keyCode = CGKeyCode(event.getIntegerValueField(.keyboardEventKeycode))
         let mods = Modifiers.from(cgFlags: event.flags)
-        let consumed = onKey?(KeyEvent(keyCode: keyCode, modifiers: mods)) ?? false
-        // Diagnostic: log modified keystrokes only (avoid logging plain typing).
-        if !mods.isEmpty {
+        let consumed = onKey?(KeyEvent(keyCode: keyCode, modifiers: mods), isRepeat) ?? false
+        // Diagnostic: log modified keystrokes only (avoid logging plain typing),
+        // and skip repeat spam so the log stays readable.
+        if !mods.isEmpty && !isRepeat {
             Log.line("key: \(mods.symbols)\(KeyNames.name(for: keyCode)) (code=\(keyCode)) consumed=\(consumed)")
         }
         return consumed ? nil : Unmanaged.passUnretained(event)

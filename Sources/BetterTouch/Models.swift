@@ -164,6 +164,7 @@ enum ActionCategory: String, CaseIterable, Identifiable {
 enum ActionKind: String, Codable, CaseIterable, Identifiable {
     // Window management
     case windowLeftHalf, windowRightHalf, windowMaximize, windowCenter
+    case enterFullScreen, exitFullScreen
     // Audio & media
     case volumeUp, volumeDown, muteToggle, micMuteToggle
     case mediaPlayPause, mediaNext, mediaPrevious
@@ -185,6 +186,8 @@ enum ActionKind: String, Codable, CaseIterable, Identifiable {
         case .windowRightHalf: return "Snap Right Half"
         case .windowMaximize: return "Maximize Window"
         case .windowCenter: return "Center Window"
+        case .enterFullScreen: return "Enter Full Screen"
+        case .exitFullScreen: return "Exit Full Screen"
         case .volumeUp: return "Volume Up"
         case .volumeDown: return "Volume Down"
         case .muteToggle: return "Toggle Mute"
@@ -214,6 +217,8 @@ enum ActionKind: String, Codable, CaseIterable, Identifiable {
         case .windowRightHalf: return "rectangle.righthalf.inset.filled"
         case .windowMaximize: return "arrow.up.left.and.arrow.down.right"
         case .windowCenter: return "rectangle.center.inset.filled"
+        case .enterFullScreen: return "arrow.up.left.and.arrow.down.right.rectangle"
+        case .exitFullScreen: return "arrow.down.right.and.arrow.up.left.rectangle"
         case .volumeUp: return "speaker.wave.3.fill"
         case .volumeDown: return "speaker.wave.1.fill"
         case .muteToggle: return "speaker.slash.fill"
@@ -238,7 +243,8 @@ enum ActionKind: String, Codable, CaseIterable, Identifiable {
 
     var category: ActionCategory {
         switch self {
-        case .windowLeftHalf, .windowRightHalf, .windowMaximize, .windowCenter:
+        case .windowLeftHalf, .windowRightHalf, .windowMaximize, .windowCenter,
+             .enterFullScreen, .exitFullScreen:
             return .window
         case .volumeUp, .volumeDown, .muteToggle, .micMuteToggle,
              .mediaPlayPause, .mediaNext, .mediaPrevious:
@@ -269,6 +275,19 @@ enum ActionKind: String, Codable, CaseIterable, Identifiable {
     }
 
     var usesKeyCombo: Bool { self == .sendShortcut }
+
+    /// Whether the action should re-fire on keyboard auto-repeat (key held down).
+    /// Remaps and volume nudges feel natural repeating; everything else fires
+    /// once per press so a held key doesn't, e.g., launch an app 30 times.
+    var repeatsWhileHeld: Bool {
+        switch self {
+        case .sendShortcut, .volumeUp, .volumeDown,
+             .windowLeftHalf, .windowRightHalf:
+            return true
+        default:
+            return false
+        }
+    }
 }
 
 struct Action: Codable, Equatable, Identifiable {

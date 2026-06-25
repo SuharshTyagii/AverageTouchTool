@@ -26,6 +26,8 @@ enum ActionRunner {
         case .windowCenter:     moveFrontWindow { area, cur in
             CGRect(x: area.midX - cur.width / 2, y: area.midY - cur.height / 2,
                    width: cur.width, height: cur.height) }
+        case .enterFullScreen:  setFrontWindowFullScreen(true)
+        case .exitFullScreen:   setFrontWindowFullScreen(false)
         case .captureSelection: capture(interactive: true)
         case .captureScreen:    capture(interactive: false)
         case .sendShortcut:
@@ -167,6 +169,27 @@ enum ActionRunner {
             AXUIElementSetAttributeValue(window, kAXSizeAttribute as CFString, sizeVal)
         }
         Log.line("window: \(app.localizedName ?? "?") -> \(target)")
+    }
+
+    /// Toggle native (green-button) full screen on the focused window of the
+    /// frontmost app via the AX `AXFullScreen` attribute. Setting it to a value
+    /// it's already at is a no-op, so enter/exit are safe to bind separately.
+    private static func setFrontWindowFullScreen(_ on: Bool) {
+        guard let app = NSWorkspace.shared.frontmostApplication else { return }
+        let axApp = AXUIElementCreateApplication(app.processIdentifier)
+
+        var winRef: CFTypeRef?
+        guard AXUIElementCopyAttributeValue(axApp, kAXFocusedWindowAttribute as CFString, &winRef) == .success,
+              let winRef else { Log.line("fullscreen: no focused window"); return }
+        let window = winRef as! AXUIElement
+
+        let attr = "AXFullScreen" as CFString
+        let result = AXUIElementSetAttributeValue(window, attr, on as CFBoolean)
+        if result != .success {
+            Log.line("fullscreen: \(on ? "enter" : "exit") failed (\(result.rawValue)) — window may not support it")
+        } else {
+            Log.line("fullscreen: \(app.localizedName ?? "?") -> \(on ? "enter" : "exit")")
+        }
     }
 
     private static func copyAX(_ element: AXUIElement, _ attr: String) -> CFTypeRef? {

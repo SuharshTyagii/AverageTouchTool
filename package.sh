@@ -18,7 +18,7 @@ APP="AverageTouchTool.app"
 EXEC="BetterTouch"                       # SPM product name (binary inside the bundle)
 BUNDLE_ID="com.suharsh.bettertouch"      # keep stable so permissions persist
 DISPLAY_NAME="AverageTouchTool"
-VERSION="1.0.1"
+VERSION="1.1.0"
 INSTALL_DIR="/Applications"
 
 # Pick a stable codesigning identity if one exists; otherwise fall back to
