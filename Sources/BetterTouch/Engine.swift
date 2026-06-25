@@ -49,6 +49,7 @@ final class Engine: ObservableObject {
         keyboardTapActive = keyboard.start()
         multitouchActive = MultitouchGesture.shared.start()
         observeFrontmostApp()
+        observeWake()
 
         Log.line("engine start: keyboardTap=\(keyboardTapActive) multitouch=\(multitouchActive) " +
                  "touchBar=\(DFR.isAvailable) nightShift=\(NightShift.shared.isAvailable) " +
@@ -84,6 +85,26 @@ final class Engine: ObservableObject {
     private func updateFrontmost(_ app: NSRunningApplication?) {
         frontmostBundleID = app?.bundleIdentifier
         frontmostName = app?.localizedName
+    }
+
+    // MARK: Sleep/wake recovery
+
+    /// On wake, macOS leaves our MultitouchSupport device handles dead — frames
+    /// stop arriving and gestures silently break until an app restart. Re-arm
+    /// the trackpad stream on system wake (and screen wake, which covers idle
+    /// display-sleep) so swipes keep working. The keyboard tap recovers itself
+    /// via tapDisabled re-arming, so it needs no equivalent here.
+    private func observeWake() {
+        let nc = NSWorkspace.shared.notificationCenter
+        let rearm: (Notification) -> Void = { [weak self] _ in
+            guard let self else { return }
+            self.multitouchActive = MultitouchGesture.shared.restart()
+            Log.line("engine: re-armed multitouch on wake (active=\(self.multitouchActive))")
+        }
+        nc.addObserver(forName: NSWorkspace.didWakeNotification,
+                       object: nil, queue: .main, using: rearm)
+        nc.addObserver(forName: NSWorkspace.screensDidWakeNotification,
+                       object: nil, queue: .main, using: rearm)
     }
 
     // MARK: Event handling

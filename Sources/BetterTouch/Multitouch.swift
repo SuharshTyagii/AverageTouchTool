@@ -105,6 +105,30 @@ final class MultitouchGesture {
         return started
     }
 
+    /// Re-arm the trackpad frame stream after the system stops it on sleep.
+    /// macOS halts the MTDevices on sleep and does NOT re-register our callback
+    /// on wake, so the handles in `devices` go dead and no more frames arrive
+    /// (the app keeps running but gestures silently stop). Dropping the stale
+    /// device list and running `start()` again recreates the list, re-registers
+    /// the callback, and restarts the devices. This does NOT touch the swipe
+    /// detection path — only the device plumbing the framework drops on sleep.
+    @discardableResult
+    func restart() -> Bool {
+        Log.line("MT: restart requested (re-arming after sleep)")
+        devices.removeAll()
+        deviceList = nil
+        started = false
+        loggedFirstFrame = false
+        // Any in-flight gesture state is stale across a sleep; clear it so the
+        // first post-wake frame starts a fresh accumulation.
+        tracking = false
+        maxFingers = 0
+        advTracking = false
+        advPeakFingers = 0
+        advStartSpread = 0
+        return start()
+    }
+
     // C callback: no captured context, so route through the singleton.
     // handleFrame() owns the (locked) swipe path; handleAdvanced() runs
     // alongside it for taps / pinch / rotate and never mutates swipe state.
