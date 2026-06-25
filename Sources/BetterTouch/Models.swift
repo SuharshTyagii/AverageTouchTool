@@ -164,7 +164,7 @@ enum ActionCategory: String, CaseIterable, Identifiable {
 enum ActionKind: String, Codable, CaseIterable, Identifiable {
     // Window management
     case windowLeftHalf, windowRightHalf, windowMaximize, windowCenter
-    case enterFullScreen, exitFullScreen
+    case enterFullScreen, exitFullScreen, toggleFullScreen
     // Audio & media
     case volumeUp, volumeDown, muteToggle, micMuteToggle
     case mediaPlayPause, mediaNext, mediaPrevious
@@ -188,6 +188,7 @@ enum ActionKind: String, Codable, CaseIterable, Identifiable {
         case .windowCenter: return "Center Window"
         case .enterFullScreen: return "Enter Full Screen"
         case .exitFullScreen: return "Exit Full Screen"
+        case .toggleFullScreen: return "Toggle Full Screen"
         case .volumeUp: return "Volume Up"
         case .volumeDown: return "Volume Down"
         case .muteToggle: return "Toggle Mute"
@@ -219,6 +220,7 @@ enum ActionKind: String, Codable, CaseIterable, Identifiable {
         case .windowCenter: return "rectangle.center.inset.filled"
         case .enterFullScreen: return "arrow.up.left.and.arrow.down.right.rectangle"
         case .exitFullScreen: return "arrow.down.right.and.arrow.up.left.rectangle"
+        case .toggleFullScreen: return "arrow.up.left.and.arrow.down.right.rectangle.fill"
         case .volumeUp: return "speaker.wave.3.fill"
         case .volumeDown: return "speaker.wave.1.fill"
         case .muteToggle: return "speaker.slash.fill"
@@ -244,7 +246,7 @@ enum ActionKind: String, Codable, CaseIterable, Identifiable {
     var category: ActionCategory {
         switch self {
         case .windowLeftHalf, .windowRightHalf, .windowMaximize, .windowCenter,
-             .enterFullScreen, .exitFullScreen:
+             .enterFullScreen, .exitFullScreen, .toggleFullScreen:
             return .window
         case .volumeUp, .volumeDown, .muteToggle, .micMuteToggle,
              .mediaPlayPause, .mediaNext, .mediaPrevious:
